@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken')
 const path = require('path')
@@ -10,10 +11,11 @@ const teamsRoute = require('./routes/teamsRoute')
 const gamesRoute = require('./routes/gamesRoute')
 const usersRoute = require('./routes/usersRoute')
 
+mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true});
+
 const app = express()
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
-
 
 app.use((req, res, next) => {
     if(req.headers.authorization) {

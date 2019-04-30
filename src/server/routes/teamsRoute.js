@@ -37,4 +37,35 @@ router.get('/my_teams', (req, res) => {
     }
 })
 
+router.post('create', (req, res) => {
+    const username = req.username
+    if(!username) {
+        res.status(403).end()
+        return
+    }
+
+    const {teamName, licence} = req.body
+    if(!teamName || !licence) {
+        res.status(400)
+    } else {
+        User.findOne({username}, (err, user) => {
+            if(err) throw err
+            Team.find({name: teamName}, (err, oldTeam)  => {
+                if(err) throw err
+                if(oldTeam) {
+                    res.status(400).json({error: 'name_taken'})
+                } else {
+                    new Team({
+                        name: teamName,
+                        licence: licence,
+                        users: [user._id],
+                        owner: user._id
+                    }).save()
+                    res.status(201).json({teamName})
+                }
+            }) 
+        })
+    }
+})
+
 module.exports = router

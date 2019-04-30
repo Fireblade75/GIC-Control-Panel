@@ -16,7 +16,7 @@
             </div>
             <div class="row">
                 <div class="offset-sm-2 col-sm-10">
-                    <button type="submit"  v-on:click="submit" class="btn btn-primary col-sm-3">Login</button>
+                    <button type="submit"  v-on:click.prevent="submit" class="btn btn-primary col-sm-3">Login</button>
                 </div>
             </div>
         </form>
@@ -26,15 +26,32 @@
 <script>
     export default {
         name: "Login",
-        data: {
-            username: '',
-            password: ''
+        data: function() {
+            return {
+                username: '',
+                password: ''
+            }
         },
         methods: {
             submit: function(event) {
-                console.log ({
-                    username: this.username,
-                    password: this.password
+                fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: this.username,
+                        password: this.password
+                    })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.error) {
+                        console.error(res.error)
+                    } else {
+                        this.$store.commit('setUser', res)
+                        this.$router.push('/teams')
+                    }
                 })
             }
         }
