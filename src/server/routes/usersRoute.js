@@ -20,10 +20,12 @@ router.post('login', (req, res) => {
                     if(!same) {
                         res.status(401)
                     } else {
-                        jwt.sign(
+                        const token = jwt.sign(
                             { username: user.username },
                             process.env.JWT_KEY,
                             { expiresIn: '24h' })
+                        res.setHeader("Authorization", token)
+                        res.status(200).end()
                     }
                 })
             }

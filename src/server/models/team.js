@@ -5,7 +5,7 @@ const model = mongoose.model('Team', {
     name: String,
     users: [{ type: ObjectId, ref: 'User' }],
     licence: String,
-    ownerId: { type: ObjectId, ref: 'User' }
+    owner: { type: ObjectId, ref: 'User' }
 })
 
 module.exports = model
