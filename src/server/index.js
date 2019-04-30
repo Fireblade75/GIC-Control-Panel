@@ -2,6 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken')
+const path = require('path')
 require('dotenv').config()
 
 const serversRoute = require('./routes/serversRoute')
@@ -12,6 +13,8 @@ const usersRoute = require('./routes/usersRoute')
 const app = express()
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
+
+
 app.use((req, res, next) => {
     if(req.headers.authorization) {
         const token = req.headers.authorization
@@ -28,12 +31,14 @@ app.use((req, res, next) => {
     }
 })
 
-app.use('servers', serversRoute)
-app.use('teams', teamsRoute)
-app.use('games', gamesRoute)
-app.use('users', usersRoute)
 
-app.use('files', express.static('games'))
-app.use(express.static('dist'))
+app.use('/api/servers', serversRoute)
+app.use('/api/teams', teamsRoute)
+app.use('/api/games', gamesRoute)
+app.use('/api/users', usersRoute)
+
+
+app.use('/api/files', express.static(path.join(__dirname, '../../games')))
+app.use(express.static(path.join(__dirname, '../../dist')))
 
 app.listen(process.env.PORT || 8080, () => console.log(`Listening on port ${process.env.PORT || 8080}!`))
