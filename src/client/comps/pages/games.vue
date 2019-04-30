@@ -30,18 +30,33 @@
         <section class="mt-5">
             <h2>Manage Games</h2>
             Manage the games of your team
+            <div class="mt-4">
+                <GameInstance 
+                    v-for="(game, index) in games" v-bind:key="index" 
+                    v-bind:gameName="game.gameName" 
+                    v-bind:instances="game.instances" />
+            </div>
         </section>
     </div>
 </template>
 
 <script>
+    import GameInstance from '../core/game-instances'
 
     export default {
-        name: "Teams",
+        name: "Games",
+        components: {
+            "GameInstance": GameInstance,
+        },
         data: function() {
             return {
                 teamNames: ['---', 'Team A', 'Team B'],
-                selectedTeam: '---'
+                selectedTeam: '---',
+                games: [
+                    { gameName: 'Zombies', instances: 0 },
+                    { gameName: 'Dragons', instances: 1 },
+                    { gameName: 'Space Shooter', instances: 0 }
+                ]
             }
         },
         computed: {

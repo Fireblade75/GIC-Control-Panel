@@ -22,13 +22,13 @@
                 <div class="form-group row">
                     <label for="team-name" class="col-sm-2 col-form-label">Team Name</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="team-name" v-model="fullName" placeholder="Team Name">
+                        <input type="text" class="form-control" id="team-name" v-model="newTeamName" placeholder="Team Name">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="team-lincence" class="col-sm-2 col-form-label">Full Name</label>
+                    <label for="team-lincence" class="col-sm-2 col-form-label">Licence</label>
                     <div class="col-sm-10">
-                        <select v-model="selected" class="form-control" id="team-lincence">
+                        <select v-model="selectedLicence" class="form-control" id="team-lincence">
                         <option v-for="(item, index) in licenceOptions" v-bind:key="index">
                             {{ item }}
                         </option>
@@ -53,7 +53,9 @@
             return {
                 teamOptions: ['---', 'Team A', 'Team B'],
                 licenceOptions: ['Basic', 'Premium', 'Enterprise'],
-                selectedTeam: '---'
+                selectedTeam: '---',
+                newTeamName: '',
+                selectedLicence: ''
             }
         },
         computed: {
