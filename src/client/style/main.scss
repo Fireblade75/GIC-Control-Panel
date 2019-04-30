@@ -6,4 +6,12 @@ body {
 main {
     background-color: #f8f9fa ;
     margin-top:48px;
+    border-radius: 16px;
+    border: 32px solid #f8f9fa;
+
+    @media screen and (max-width: 600px) {
+        border-left: 16px solid #f8f9fa;
+        border-right: 16px solid #f8f9fa;
+    }
 }
+

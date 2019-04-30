@@ -23,6 +23,7 @@
   "homepage": "https://gitlab.com/Fireblade75/simple-server-manager#readme",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.18.3",
     "dotenv": "^6.2.0",
     "express": "^4.16.3",

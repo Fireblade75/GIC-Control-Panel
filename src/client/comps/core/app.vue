@@ -2,7 +2,7 @@
     <div>
         <Header />
         <main class="container">
-            hi
+            <router-view></router-view>
         </main>
     </div>
 </template>
