@@ -1,8 +1,7 @@
 const mongoose = require('mongoose')
 
-const model = mongoose.model('Team', {
+const model = mongoose.model('User', {
     name: String,
-    userId: Number,
     email: String,
     hash: String
 })

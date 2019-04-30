@@ -1,11 +1,11 @@
 const mongoose = require('mongoose')
+const ObjectId = mongoose.Schema.Types.ObjectId
 
 const model = mongoose.model('Team', {
     name: String,
-    teamId: Number,
-    users: [Number],
+    users: [{ type: ObjectId, ref: 'User' }],
     licence: String,
-    ownerId: Number
+    ownerId: { type: ObjectId, ref: 'User' }
 })
 
 module.exports = model

@@ -4,7 +4,7 @@ const Server = require('../models/servers')
 const router = Router()
 
 router.get('/my_team', (req, res) => {
-    if(req.user) {
+    if(req.username) {
         
     }
 })
