@@ -20,6 +20,7 @@
                     <input type="password" class="form-control" id="register-password" v-model="password" placeholder="password">
                 </div>
             </div>
+            <AlertBox v-bind:message="error.message" v-bind:level="error.level" offset="offset-sm-2 col-sm-10" />
             <div class="row">
                 <div class="offset-sm-2 col-sm-10">
                     <button type="submit" v-on:click.prevent="submit" class="btn btn-primary col-sm-3">Register</button>
@@ -30,17 +31,34 @@
 </template>
 
 <script>
+    import AlertBox from '../core/alert-box'
+
     export default {
         name: "Register",
+        components: {
+            "AlertBox": AlertBox,
+        },
         data: function() {
             return {
                 username: '',
                 password: '',
-                fullName: ''
+                fullName: '',
+                error: {
+                    message: '',
+                    level: ''
+                }
             }
         },
         methods: {
             submit: function(event) {
+                if(!this.username || !this.password || !this.fullName) {
+                    this.error = {
+                        message: 'Some fields are empty',
+                        level: 'warning'
+                    }
+                    return
+                }
+
                 fetch('/api/users/register', {
                     method: 'POST',
                     headers: {
@@ -58,10 +76,17 @@
                         this.$store.commit('setUsername', this.username)
                         this.$router.push('/welcome')
                     } else {
-                        res.json().then(obj => {
+                        res.json().then((obj) => {
                             this.password = ''
                             if(obj.error) {
-                                console.error(obj.error)
+                                this.error.level = 'error'
+                                switch(obj.error) {
+                                    case 'username_taken':
+                                        this.error.message = 'This email address is already used'
+                                        break
+                                    default:
+                                        this.error.message = obj.error
+                                }
                             }
                         })
                     }
