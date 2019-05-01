@@ -2,6 +2,7 @@ const { Router } = require('express')
 const Server = require('../models/servers')
 const User = require('../models/user')
 const Team = require('../models/team')
+const licences = require('../models/licences')
 
 const router = Router()
 
@@ -37,20 +38,28 @@ router.get('/my_teams', (req, res) => {
     }
 })
 
-router.post('create', (req, res) => {
+router.post('/create', (req, res) => {
     const username = req.username
     if(!username) {
         res.status(403).end()
         return
     }
 
-    const {teamName, licence} = req.body
+    let {teamName, licence} = req.body
     if(!teamName || !licence) {
         res.status(400)
     } else {
+        licence = licence.toLowerCase()
+        if(!licences[licence]) {
+            res.status(400).json({
+                error: 'unknown_licence_level'
+            })
+            return
+        }
+
         User.findOne({username}, (err, user) => {
             if(err) throw err
-            Team.find({name: teamName}, (err, oldTeam)  => {
+            Team.findOne({name: teamName}, (err, oldTeam)  => {
                 if(err) throw err
                 if(oldTeam) {
                     res.status(400).json({error: 'name_taken'})

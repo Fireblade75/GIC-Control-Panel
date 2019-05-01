@@ -72,7 +72,25 @@
                 this.$store.commit('setTeam', teamName)
             },
             createTeam: function(event) {
-                
+                fetch('/api/teams/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': this.$store.getters.getToken
+                    },
+                    body: JSON.stringify({
+                        teamName: this.newTeamName,
+                        licence: this.selectedLicence,
+                    })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if(res.error) {
+                        console.error(obj.error)
+                    } else {
+                        console.log(res)
+                    }
+                })
             }
         }
     }
