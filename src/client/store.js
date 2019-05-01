@@ -8,7 +8,8 @@ const store = new Vuex.Store({
         page: '/',
         username: '',
         authToken: '',
-        team: ''
+        team: '',
+        teamList: []
     },
     getters: {
         getPage: (state) => {
@@ -22,6 +23,9 @@ const store = new Vuex.Store({
         },
         getTeam: (state) => {
             return state.team
+        },
+        getTeamList: (state) => {
+            return state.teamList
         }
     },
     mutations: {
@@ -37,6 +41,32 @@ const store = new Vuex.Store({
         },
         setTeam: (state, team) => {
             state.team = team
+        },
+        setTeamList: (state, teams) => {
+            state.teamList = teams
+        }
+    },
+    actions: {
+        fetchTeams: (context) => {
+            if(!context.state.authToken) {
+                context.commit('setTeamList', [])
+            } else {
+                fetch('/api/teams/teamlist', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': context.state.authToken
+                    }
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if(res.error) {
+                        console.error(res.error)
+                    } else {
+                        context.commit('setTeamList', res)
+                    }
+                })
+            }
         }
     }
 })

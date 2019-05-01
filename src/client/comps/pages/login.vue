@@ -14,7 +14,11 @@
                     <input type="password" class="form-control" id="login-password" v-model="password" placeholder="password">
                 </div>
             </div>
-            <AlertBox v-bind:message="error.message" v-bind:level="error.level" offset="offset-sm-2 col-sm-10" />
+            <AlertBox 
+                v-bind:message="error.message" 
+                v-bind:level="error.level" 
+                offset="offset-sm-2 col-sm-10"
+                v-on:closeAlert="closeError" />
             <div class="row">
                 <div class="offset-sm-2 col-sm-10">
                     <button type="submit"  v-on:click.prevent="submit" class="btn btn-primary col-sm-3">Login</button>
@@ -80,8 +84,10 @@
                 })
             },
             closeError: function(event) {
-                this.error = ''
-                this.alertLevel = ''
+                this.error = {
+                    message: '',
+                    level: ''
+                }
             }
         }
     }

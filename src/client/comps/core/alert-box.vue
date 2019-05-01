@@ -1,9 +1,9 @@
 <template>
     <div class="form-group row" v-if="message">
         <div v-bind:class="[offset]">
-            <div class="alert alert-warning bm-0" v-bind:class="[alertLevel, 'alert', 'bm-0']">
+            <div v-bind:class="[alertLevel, 'alert', 'bm-0']">
                 {{ message }}
-                <button type="button" class="close" v-on:click.prevent="closeError" aria-label="Close">
+                <button type="button" class="close" v-on:click.prevent="$emit('closeAlert')" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -28,11 +28,6 @@
                     case 'success': return 'alert-success'
                     default: return 'alert-info'
                 }
-            }
-        },
-        methods: {
-            closeError: function(event) {
-                this.message = ''
             }
         }
     }

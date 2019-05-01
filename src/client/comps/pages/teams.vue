@@ -7,7 +7,7 @@
                 <div class="form-group mr-sm-3 mb-2">
                     <label for="selected-team" class="sr-only">Team</label>
                     <select v-model="selectedTeam" class="form-control" id="selected-team">
-                        <option v-for="(item, index) in teamOptions" v-bind:key="index">
+                        <option v-for="(item, index) in teamList" v-bind:key="index">
                             {{ item }}
                         </option>
                     </select>
@@ -35,6 +35,10 @@
                     </select>
                     </div>
                 </div>
+                <AlertBox v-bind:message="error.message" 
+                    v-bind:level="error.level" 
+                    offset="offset-sm-2 col-sm-10"
+                    v-on:closeAlert="closeError" />
                 <div class="row">
                     <div class="offset-sm-2 col-sm-10">
                         <button type="submit" v-on:click.prevent="createTeam" class="btn btn-primary col-sm-3">Create Team</button>
@@ -46,21 +50,31 @@
 </template>
 
 <script>
+    import AlertBox from '../core/alert-box'
 
     export default {
         name: "Teams",
+        components: {
+            "AlertBox": AlertBox,
+        },
         data: function() {
             return {
-                teamOptions: ['---', 'Team A', 'Team B'],
                 licenceOptions: ['Basic', 'Premium', 'Enterprise'],
                 selectedTeam: '---',
                 newTeamName: '',
-                selectedLicence: ''
+                selectedLicence: 'Basic',
+                error: {
+                    message: '',
+                    level: ''
+                }
             }
         },
         computed: {
             team() {
                 return this.$store.getters.getTeam
+            },
+            teamList() {
+                return [ '---', ...this.$store.getters.getTeamList]
             }
         },
         methods: {
@@ -72,6 +86,13 @@
                 this.$store.commit('setTeam', teamName)
             },
             createTeam: function(event) {
+                if(!this.newTeamName) {
+                    this.error = {
+                        message: 'Team name can not be empty',
+                        level: 'warning'
+                    }
+                    return
+                }
                 fetch('/api/teams/create', {
                     method: 'POST',
                     headers: {
@@ -86,12 +107,32 @@
                 .then(res => res.json())
                 .then(res => {
                     if(res.error) {
-                        console.error(obj.error)
+                        this.error.level = 'error'
+                        switch(res.error) {
+                            case 'name_taken':
+                                this.error.message = 'Team name is already taken'
+                                break
+                            default:
+                                this.error.message = res.error
+                        }
                     } else {
-                        console.log(res)
+                        this.error = {
+                            level: 'success',
+                            message: 'Team "' + this.newTeamName + '" is successfully created'
+                        }
+                        this.$store.dispatch('fetchTeams')
                     }
                 })
+            },
+            closeError: function(event) {
+                this.error = {
+                    message: '',
+                    level: ''
+                }
             }
+        },
+        beforeMount: function() {
+            this.$store.dispatch('fetchTeams')
         }
     }
 </script>

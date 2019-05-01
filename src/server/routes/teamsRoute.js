@@ -38,6 +38,25 @@ router.get('/my_teams', (req, res) => {
     }
 })
 
+router.get('/teamlist', (req, res) => {
+    if(req.username) {
+        User.findOne({username: req.username}, (err, user) => {
+                if(err) throw err
+                if(!user) {
+                    res.status(401).json({error: 'user_no_longer_exists'})
+                }
+                Team.find({users: user._id}, (err, teams) => {
+                    if(err) throw err
+                    const result = teams.map(t => t.name)
+                    res.json(result)
+                })
+        })
+    } else {
+        res.status(401).end()
+    }
+})
+
+
 router.post('/create', (req, res) => {
     const username = req.username
     if(!username) {
