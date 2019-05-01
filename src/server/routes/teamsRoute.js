@@ -1,42 +1,10 @@
 const { Router } = require('express')
-const Server = require('../models/servers')
+const Game = require('../models/game')
 const User = require('../models/user')
 const Team = require('../models/team')
 const licences = require('../models/licences')
 
 const router = Router()
-
-router.get('/my_teams', (req, res) => {
-    if(req.username) {
-        User.findOne({username: req.username})
-            .populate('users')
-            .populate('owner')
-            .exec((err, user) => {
-                if(err) throw err
-                if(!user) {
-                    res.status(401).end()
-                }
-                Team.find({users: user._id}, (err, teams) => {
-                    if(err) throw err
-                    const result = teams.map(t => {
-                        return {
-                            name: t.name,
-                            users: (t.users.map(u => u.username)),
-                            licence: t.licence,
-                            owner: t.owner.username
-                        }
-                    })
-                    if(result) {
-                        res.json(result)
-                    } else {
-                        res.status(204).end()
-                    }
-                })
-        })
-    } else {
-        res.status(401).end()
-    }
-})
 
 router.get('/teamlist', (req, res) => {
     if(req.username) {
@@ -48,9 +16,46 @@ router.get('/teamlist', (req, res) => {
                 Team.find({users: user._id}, (err, teams) => {
                     if(err) throw err
                     const result = teams.map(t => {
-                        return { name: t.name, licence: t.licence }
+                        return { 
+                            id: t._id,
+                            name: t.name, 
+                            licence: t.licence 
+                        }
                     })
+                    
                     res.json(result)
+                })
+        })
+    } else {
+        res.status(401).end()
+    }
+})
+
+router.get('/teamlist/games', (req, res) => {
+    if(req.username) {
+        User.findOne({username: req.username}, (err, user) => {
+                if(err) throw err
+                if(!user) {
+                    res.status(401).json({error: 'user_no_longer_exists'})
+                }
+                Team.find({users: user._id}, (err, teams) => {
+                    if(err) throw err
+                    const promises = teams.map(team => {
+                        return new Promise((resolve, reject) => {
+                            Game.find({team: team._id}, (err, games) => {
+                                if(err) throw err
+                                resolve({ 
+                                    id: team._id,
+                                    name: team.name, 
+                                    licence: team.licence,
+                                    games: games.map(g => g.name) 
+                                })
+                            })
+                        })
+                    })
+                    Promise.all(promises).then(result => {
+                        res.json(result)
+                    })
                 })
         })
     } else {
@@ -72,7 +77,7 @@ router.post('/create', (req, res) => {
 
     let {teamName, licence} = req.body
     if(!teamName || !licence) {
-        res.status(400)
+        res.status(400).end()
     } else {
         licence = licence.toLowerCase()
         if(!licences[licence]) {

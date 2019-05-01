@@ -5,7 +5,7 @@
             <ServerInstance 
                 v-for="i in instances" v-bind:key="i" 
                 v-bind:serverId="i" 
-                v-bind:instances="1" />
+                v-bind:games="team.games" />
             </div>
         </section>
 </template>

@@ -3,7 +3,7 @@
         <label class="col-sm-2 col-form-label">Server {{serverId}}</label>
         <div class="col-sm-8 mb-1">
             <select v-model="selectedItem" class="form-control">
-                <option v-for="(item, index) in instanceOptions" v-bind:key="index">
+                <option v-for="(item, index) in gameList" v-bind:key="index">
                     {{ item }}
                 </option>
             </select>
@@ -20,16 +20,23 @@
         name: "Instance",
         props: {
             serverId: Number,
-            instances: Number
+            games: {
+                type: Array,
+                default: ['---']
+            },
+            selectedGame: {
+                type: String,
+                default: '---'
+            }
         },
         data: function() {
             return {
-                instanceOptions: ['Disabled', '1 Instance', '2 Instances']
+                selectedItem: this.selectedGame
             }
         },
         computed: {
-            selectedItem: function() {
-                return this.instanceOptions[this.instances]
+            gameList: function() {
+                return ['---', ...this.games ]
             }
         },
         methods: {

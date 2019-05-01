@@ -73,13 +73,42 @@
                         message: 'Game name can not be empty',
                         level: 'warning'
                     }
-                    return
                 } else if(this.selectedTeam === '---') {
                     this.error = {
                         message: 'Please select a team',
                         level: 'warning'
                     }
-                    return
+                } else {
+                    fetch('/api/games/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': this.$store.getters.getToken
+                        },
+                        body: JSON.stringify({
+                            teamName: this.selectedTeam,
+                            gameName: this.newGameName,
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.error) {
+                            this.error.level = 'error'
+                            switch(res.error) {
+                                case 'game_name_taken':
+                                    this.error.message = 'This name is already taken'
+                                        break
+                                    default:
+                                        this.error.message = res.error
+                            }
+                        } else {
+                            this.error = {
+                                message: this.newGameName + ' is aangemaakt',
+                                level: 'info'
+                            }
+                            this.newGameName = ''
+                        }
+                    })
                 }
             },
             closeError: function(event) {

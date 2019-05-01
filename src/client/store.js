@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import fetchTeams from './fetchers/fetchTeams'
+
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -44,7 +46,7 @@ const store = new Vuex.Store({
             if(!context.state.authToken) {
                 context.commit('setTeamList', [])
             } else {
-                fetch('/api/teams/teamlist', {
+                fetch('/api/teams/teamlist/games', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
