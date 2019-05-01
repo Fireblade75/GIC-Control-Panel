@@ -20,10 +20,10 @@
                     </select>
                     </div>
                 </div>
-                <AlertBox v-bind:message="addError.message" 
-                    v-bind:level="addError.level" 
+                <AlertBox v-bind:message="error.message" 
+                    v-bind:level="error.level" 
                     offset="offset-sm-2 col-sm-10"
-                    v-on:closeAlert="closeAddError" />
+                    v-on:closeAlert="closeError" />
                 <div class="row">
                     <div class="offset-sm-2 col-sm-10">
                         <button type="submit" v-on:click.prevent="addGame" class="btn btn-primary col-sm-3">Add Game</button>
@@ -31,27 +31,15 @@
                 </div>
             </form>
         </section>
-        <section class="mt-5">
-            <h2>Manage Games</h2>
-            Manage the games of your team
-            <div class="mt-4">
-                <GameInstance 
-                    v-for="(game, index) in games" v-bind:key="index" 
-                    v-bind:gameName="game.gameName" 
-                    v-bind:instances="game.instances" />
-            </div>
-        </section>
     </div>
 </template>
 
 <script>
-    import GameInstance from '../core/game-instances'
     import AlertBox from '../core/alert-box'
 
     export default {
         name: "Games",
         components: {
-            "GameInstance": GameInstance,
             "AlertBox": AlertBox
         },
         data: function() {
@@ -63,7 +51,7 @@
                     { gameName: 'Dragons', instances: 1 },
                     { gameName: 'Space Shooter', instances: 0 }
                 ],
-                addError: {
+                error: {
                     message: '',
                     level: ''
                 },
@@ -74,31 +62,28 @@
             }
         },
         computed: {
-            team() {
-                return this.$store.getters.getTeam
-            },
             teamList() {
-                return [ '---', ...this.$store.getters.getTeamList]
+                return [ '---', ...this.$store.getters.getTeamNames]
             }
         },
         methods: {
             addGame: function(event) {
                 if(!this.newGameName) {
-                    this.addError = {
+                    this.error = {
                         message: 'Game name can not be empty',
                         level: 'warning'
                     }
                     return
                 } else if(this.selectedTeam === '---') {
-                    this.addError = {
+                    this.error = {
                         message: 'Please select a team',
                         level: 'warning'
                     }
                     return
                 }
             },
-            closeAddError: function(event) {
-                this.addError = {
+            closeError: function(event) {
+                this.error = {
                     message: '',
                     level: ''
                 }

@@ -1,14 +1,14 @@
 <template>
     <div class="form-group row">
-        <label class="col-sm-2 col-form-label">{{gameName}}</label>
-        <div class="col-sm-8 mb-3">
+        <label class="col-sm-2 col-form-label">Server {{serverId}}</label>
+        <div class="col-sm-8 mb-1">
             <select v-model="selectedItem" class="form-control">
                 <option v-for="(item, index) in instanceOptions" v-bind:key="index">
                     {{ item }}
                 </option>
             </select>
         </div>
-        <div class="col-sm-2 mb-3">
+        <div class="col-sm-2 mb-1">
             <button type="submit" v-on:click.prevent="apply" class="btn btn-primary btn-block">Apply</button>
         </div>
     </div>
@@ -17,9 +17,9 @@
 <script>
 
     export default {
-        name: "GameInstance",
+        name: "Instance",
         props: {
-            gameName: String,
+            serverId: Number,
             instances: Number
         },
         data: function() {

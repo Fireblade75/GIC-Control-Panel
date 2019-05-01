@@ -70,11 +70,8 @@
             }
         },
         computed: {
-            team() {
-                return this.$store.getters.getTeam
-            },
             teamList() {
-                return [ '---', ...this.$store.getters.getTeamList]
+                return [ '---', ...this.$store.getters.getTeamNames]
             }
         },
         methods: {

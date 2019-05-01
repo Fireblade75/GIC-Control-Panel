@@ -47,13 +47,19 @@ router.get('/teamlist', (req, res) => {
                 }
                 Team.find({users: user._id}, (err, teams) => {
                     if(err) throw err
-                    const result = teams.map(t => t.name)
+                    const result = teams.map(t => {
+                        return { name: t.name, licence: t.licence }
+                    })
                     res.json(result)
                 })
         })
     } else {
         res.status(401).end()
     }
+})
+
+router.get('/licences', (req, res) => {
+    res.json(licences)
 })
 
 

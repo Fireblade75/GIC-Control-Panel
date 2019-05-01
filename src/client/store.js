@@ -5,42 +5,35 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
-        page: '/',
         username: '',
         authToken: '',
-        team: '',
-        teamList: []
+        teamList: [],
+        licences: []
     },
     getters: {
-        getPage: (state) => {
-            return state.page
-        },
         getUsername: (state) => {
             return state.username
         },
         getToken: (state) => {
             return state.authToken
         },
-        getTeam: (state) => {
-            return state.team
+        getTeamNames: (state) => {
+            return state.teamList.map(t => t.name)
         },
-        getTeamList: (state) => {
+        getTeams: (state) => {
             return state.teamList
+        },
+        getLicences: (state) => {
+            return state.licences
         }
     },
     mutations: {
-        setPage: (state, page) => {
-            state.page = page
-        },
         setUser: (state, user) => {
             state.username = user.username
             state.authToken = user.token
         },
         setUsername: (state, username) => {
             state.username = username
-        },
-        setTeam: (state, team) => {
-            state.team = team
         },
         setTeamList: (state, teams) => {
             state.teamList = teams
@@ -65,6 +58,15 @@ const store = new Vuex.Store({
                     } else {
                         context.commit('setTeamList', res)
                     }
+                })
+            }
+        },
+        fetchLicences: (context) => {
+            if(!context.state.licences.length) {
+                fetch('/api/teams/licences')
+                .then(res => res.json())
+                .then(res => {
+                    context.state.licences = res
                 })
             }
         }

@@ -21,6 +21,9 @@
                 <li class="nav-item">
                     <router-link class="nav-link" to="/games">Games</router-link>
                 </li>
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/game-servers">Game Servers</router-link>
+                </li>
             </ul>
             <ul class="navbar-nav ml-auto" v-else>
                 <li class="nav-item">
