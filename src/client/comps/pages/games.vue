@@ -97,9 +97,12 @@
                             switch(res.error) {
                                 case 'game_name_taken':
                                     this.error.message = 'This name is already taken'
-                                        break
-                                    default:
-                                        this.error.message = res.error
+                                    break
+                                case 'game_limit_reached':
+                                    this.error.message = 'Licence error: Max game limit reached'
+                                    break
+                                default:
+                                    this.error.message = res.error
                             }
                         } else {
                             this.error = {
