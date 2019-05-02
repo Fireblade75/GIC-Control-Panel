@@ -77,10 +77,9 @@
         methods: {
             selectTeam: function(event) {
                 let teamName = this.selectedTeam
-                if(teamName === '---') {
-                    teamName = ''
+                if(teamName !== '---') {
+                    this.$router.push({ path: '/team-detail', query: { teamName: this.selectedTeam } })
                 }
-                this.$store.commit('setTeam', teamName)
             },
             createTeam: function(event) {
                 if(!this.newTeamName) {
