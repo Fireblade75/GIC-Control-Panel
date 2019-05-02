@@ -4,10 +4,17 @@
         <div class="mt-4">
             <ServerInstance 
                 v-for="i in instances" v-bind:key="i" 
-                v-bind:serverId="i" 
-                v-bind:games="team.games" />
-            </div>
-        </section>
+                v-bind:serverId="i"
+                v-bind:games="team.games"
+                v-on:applyUpdate="applyUpdate"
+                v-bind:slots="team.slots" />
+        </div>
+        <AlertBox 
+                v-bind:message="error.message" 
+                v-bind:level="error.level" 
+                v-on:closeAlert="closeError"
+                v-bind:formAlert="false" />
+    </section>
 </template>
 
 <script>
@@ -43,26 +50,34 @@
             }
         },
         methods: {
-            addGame: function(event) {
-                if(!this.newGameName) {
-                    this.addError = {
-                        message: 'Game name can not be empty',
-                        level: 'warning'
-                    }
-                    return
-                } else if(this.selectedTeam === '---') {
-                    this.addError = {
-                        message: 'Please select a team',
-                        level: 'warning'
-                    }
-                    return
-                }
-            },
             closeError: function(event) {
                 this.error = {
                     message: '',
                     level: ''
                 }
+            },
+            applyUpdate: function(slot, gameName) {
+                fetch('/api/games/setslot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': this.$store.getters.getToken
+                    },
+                    body: JSON.stringify({
+                        gameName: gameName,
+                        slotId: slot,
+                        teamName: this.team.name
+                    })
+                })
+                .then(res => {
+                    const status = res.status
+                    if(status == 200 || status == 201) {
+                        this.error = {
+                            message: gameName + ' is now runing on server ' + slot,
+                            level: 'success'
+                        }
+                    }
+                })
             }
         }
     }

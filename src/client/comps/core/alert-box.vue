@@ -1,5 +1,5 @@
 <template>
-    <div class="form-group row" v-if="message">
+    <div v-bind:class="formAlert ? ['form-group', 'row'] : []" v-if="message">
         <div v-bind:class="[offset]">
             <div v-bind:class="[alertLevel, 'alert', 'bm-0']">
                 {{ message }}
@@ -17,7 +17,11 @@
         props: {
             message: String,
             level: String,
-            offset: String
+            offset: String,
+            formAlert: {
+                type: Boolean,
+                default: true
+            } 
         },
         computed: {
             alertLevel: function() {

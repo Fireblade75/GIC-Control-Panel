@@ -103,8 +103,8 @@
                             }
                         } else {
                             this.error = {
-                                message: this.newGameName + ' is aangemaakt',
-                                level: 'info'
+                                level: 'success',
+                                message: '"' + this.newGameName + '" is successfully created'
                             }
                             this.newGameName = ''
                         }

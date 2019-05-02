@@ -9,7 +9,9 @@
             </select>
         </div>
         <div class="col-sm-2 mb-1">
-            <button type="submit" v-on:click.prevent="apply" class="btn btn-primary btn-block">Apply</button>
+            <button type="submit" 
+                v-on:click.prevent="$emit('applyUpdate',serverId, selectedItem)" 
+                class="btn btn-primary btn-block">Apply</button>
         </div>
     </div>
 </template>
@@ -24,24 +26,17 @@
                 type: Array,
                 default: ['---']
             },
-            selectedGame: {
-                type: String,
-                default: '---'
-            }
+            slots: Array
         },
         data: function() {
+            const slot = this.slots.find(slot => slot.id == this.serverId)
             return {
-                selectedItem: this.selectedGame
+                selectedItem: slot ? slot.game : '---'
             }
         },
         computed: {
             gameList: function() {
                 return ['---', ...this.games ]
-            }
-        },
-        methods: {
-            apply: function(event) {
-                
             }
         }
     }

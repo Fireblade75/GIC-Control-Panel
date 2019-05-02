@@ -2,6 +2,7 @@ const { Router } = require('express')
 const Game = require('../models/game')
 const User = require('../models/user')
 const Team = require('../models/team')
+const GameInstance = require('../models/gameinstance')
 const licences = require('../models/licences')
 
 const router = Router()
@@ -38,9 +39,9 @@ router.get('/teamlist/games', (req, res) => {
                 if(!user) {
                     res.status(401).json({error: 'user_no_longer_exists'})
                 }
-                Team.find({users: user._id}, (err, teams) => {
+                Team.find({users: user._id}).populate('slots').exec((err, teams)  => {
                     if(err) throw err
-                    const promises = teams.map(team => {
+                    const gamePromises = teams.map(team => {
                         return new Promise((resolve, reject) => {
                             Game.find({team: team._id}, (err, games) => {
                                 if(err) throw err
@@ -48,12 +49,17 @@ router.get('/teamlist/games', (req, res) => {
                                     id: team._id,
                                     name: team.name, 
                                     licence: team.licence,
-                                    games: games.map(g => g.name) 
+                                    games: games.map(g => g.name),
+                                    slots: team.slots.map(s => { return {
+                                        id: s.slot,
+                                        game: s.gameName
+                                    }})
                                 })
                             })
                         })
                     })
-                    Promise.all(promises).then(result => {
+                    //const slotPromises = GameInstance.find
+                    Promise.all(gamePromises).then(result => {
                         res.json(result)
                     })
                 })
