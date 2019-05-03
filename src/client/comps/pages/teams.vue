@@ -3,16 +3,23 @@
         <section>
             <h2>Manage Team</h2>
             To manage your games you first need to select your team.
-            <form class="form-inline mt-4">
-                <div class="form-group mr-sm-3 mb-2">
-                    <label for="selected-team" class="sr-only">Team</label>
+            <form class="mt-4">
+                <div class="form-group row">
+                    <label for="selected-team" class="col-sm-2 col-form-label">Team Name</label>
+                    <div class="col-sm-10">
                     <select v-model="selectedTeam" class="form-control" id="selected-team">
                         <option v-for="(item, index) in teamList" v-bind:key="index">
                             {{ item }}
                         </option>
                     </select>
+                    </div>
                 </div>
-                <button type="submit" v-on:click.prevent="selectTeam" class="btn btn-primary col-sm-2 mb-2">Manage</button>
+                <div class="row">
+                    <div class="offset-sm-2 col-sm-10">
+                        <button type="submit" v-on:click.prevent="selectTeam" class="btn btn-primary col-sm-3">Manage</button>
+                    </div>
+                </div>
+                
             </form>
         </section>
         <section class="mt-5">
@@ -26,10 +33,10 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="team-lincence" class="col-sm-2 col-form-label">Licence</label>
+                    <label for="team-lincence" class="col-sm-2 col-form-label">License</label>
                     <div class="col-sm-10">
-                        <select v-model="selectedLicence" class="form-control" id="team-lincence">
-                        <option v-for="(item, index) in licenceOptions" v-bind:key="index">
+                        <select v-model="selectedlicense" class="form-control" id="team-lincence">
+                        <option v-for="(item, index) in licenseOptions" v-bind:key="index">
                             {{ item }}
                         </option>
                     </select>
@@ -59,10 +66,10 @@
         },
         data: function() {
             return {
-                licenceOptions: ['Basic', 'Premium', 'Enterprise'],
+                licenseOptions: ['Basic', 'Premium', 'Enterprise'],
                 selectedTeam: '---',
                 newTeamName: '',
-                selectedLicence: 'Basic',
+                selectedlicense: 'Basic',
                 error: {
                     message: '',
                     level: ''
@@ -97,7 +104,7 @@
                     },
                     body: JSON.stringify({
                         teamName: this.newTeamName,
-                        licence: this.selectedLicence,
+                        license: this.selectedlicense,
                     })
                 })
                 .then(res => res.json())

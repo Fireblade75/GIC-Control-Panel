@@ -99,7 +99,42 @@
                 }
             },
             inviteMember: function(event) {
-                this.fetchTeam()
+                if(!this.newUsername) {
+                    this.error = { message: 'Username can not be empty', level: 'warning'}
+                    return
+                }
+                fetch('/api/teams/add-member', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': this.$store.getters.getToken
+                    },
+                    body: JSON.stringify({
+                        teamName: this.teamName,
+                        memberEmail: this.newUsername,
+                    })
+                })
+                .then(res => {
+                    const status = res.status
+                    if(status != 200) {
+                        res.json().then(err => {
+                            this.error.level = 'error'
+                            switch(err.error) {
+                                case 'team_not_found':
+                                    this.error.message = 'Can no longer find team ' + this.teamName
+                                    break
+                                default:
+                                    this.error.message = err.error
+                            }
+                        })
+                    } else {
+                        this.error = {
+                            level: 'success',
+                            message: '"' + this.teamName + '" is added to the team.'
+                        }
+                       this.fetchTeam()
+                    }
+                })
             },
             fetchTeam() {
                 const teamNameQuery = encodeURIComponent(this.teamName)

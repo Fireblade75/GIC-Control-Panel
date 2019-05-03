@@ -10,7 +10,7 @@ const store = new Vuex.Store({
         username: '',
         authToken: '',
         teamList: [],
-        licences: []
+        licenses: []
     },
     getters: {
         getUsername: (state) => {
@@ -25,8 +25,8 @@ const store = new Vuex.Store({
         getTeams: (state) => {
             return state.teamList
         },
-        getLicences: (state) => {
-            return state.licences
+        getLicenses: (state) => {
+            return state.licenses
         }
     },
     mutations: {
@@ -63,12 +63,12 @@ const store = new Vuex.Store({
                 })
             }
         },
-        fetchLicences: (context) => {
-            if(!context.state.licences.length) {
-                fetch('/api/teams/licences')
+        fetchlicenses: (context) => {
+            if(!context.state.licenses.length) {
+                fetch('/api/teams/licenses')
                 .then(res => res.json())
                 .then(res => {
-                    context.state.licences = res
+                    context.state.licenses = res
                 })
             }
         }

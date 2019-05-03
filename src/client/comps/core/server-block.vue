@@ -40,13 +40,13 @@
         },
         computed: {
             instances: function() {
-                const licenceList = this.$store.getters.getLicences
-                if(!licenceList) {
+                const licenseList = this.$store.getters.getLicenses
+                if(!licenseList) {
                     console.error('Licenses not avaible in the store')
                     return 0
                 }
-                const licence = licenceList[this.team.licence]
-                return licence ? licence.instances : 0
+                const license = licenseList[this.team.license]
+                return license ? license.instances : 0
             }
         },
         methods: {

@@ -3,7 +3,7 @@ const Game = require('../models/game')
 const User = require('../models/user')
 const Team = require('../models/team')
 const GameInstance = require('../models/gameinstance')
-const licences = require('../models/licences')
+const licenseList = require('../models/licenses')
 const { findUserByName } = require('../dbreqs/user-requests')
 const { findTeamDetail } = require('../dbreqs/team-requests')
 const { findGameByName, findGamesByTeam } = require('../dbreqs/game-requests')
@@ -23,7 +23,7 @@ router.get('/teamlist', (req, res) => {
                         return { 
                             id: t._id,
                             name: t.name, 
-                            licence: t.licence 
+                            license: t.license 
                         }
                     })
                     
@@ -51,7 +51,7 @@ router.get('/teamlist/games', (req, res) => {
                                 resolve({ 
                                     id: team._id,
                                     name: team.name, 
-                                    licence: team.licence,
+                                    license: team.license,
                                     games: games.map(g => g.name),
                                     slots: team.slots.map(s => { return {
                                         id: s.slot,
@@ -72,8 +72,8 @@ router.get('/teamlist/games', (req, res) => {
     }
 })
 
-router.get('/licences', (req, res) => {
-    res.json(licences)
+router.get('/licenses', (req, res) => {
+    res.json(licenseList)
 })
 
 
@@ -84,14 +84,14 @@ router.post('/create', (req, res) => {
         return
     }
 
-    let {teamName, licence} = req.body
-    if(!teamName || !licence) {
+    let {teamName, license} = req.body
+    if(!teamName || !license) {
         res.status(400).end()
     } else {
-        licence = licence.toLowerCase()
-        if(!licences[licence]) {
+        license = license.toLowerCase()
+        if(!licenseList[license]) {
             res.status(400).json({
-                error: 'unknown_licence_level'
+                error: 'unknown_license_level'
             })
             return
         }
@@ -105,7 +105,7 @@ router.post('/create', (req, res) => {
                 } else {
                     new Team({
                         name: teamName,
-                        licence: licence,
+                        license: license,
                         users: [user._id],
                         owner: user._id
                     }).save()
@@ -133,21 +133,58 @@ router.get('/detail', async (req, res) => {
             const result = {
                 id: team._id,
                 name: team.name, 
-                licence: team.licence,
+                license: team.license,
                 games: games.map(g => g.name),
                 slots: team.slots.map(s => { return {
                     id: s.slot,
                     game: s.gameName
                 }}),
                 members: team.users.map(usr => {
+                    const isOwner = usr._id.equals(team.owner._id)
                     return {
                         fullName: usr.fullName,
                         email: usr.username,
-                        type: usr._id = team.owner._id ? 'Owner' : 'Member'
+                        type: isOwner ? 'Owner' : 'Member'
                     }
                 })
             }
             res.json(result)
+        }
+    }
+})
+
+router.post('/add-member', async (req, res) => {
+    const username = req.username
+    let { teamName, memberEmail } = req.body
+    if(!username) {
+        res.status(403).end()
+    } else if(!teamName || !memberEmail) {
+        res.status(400).end()
+    } else {
+        memberEmail = memberEmail.toLowerCase()
+        const user = await findUserByName(username)
+        const team = await findTeamDetail(teamName, user._id)
+        if(!team) {
+            res.status(404).json({error: 'team_not_found'})
+        } else {
+            const member = await findUserByName(memberEmail)
+            if(!member) {
+                res.status(404).json({error: 'member_not_found'})
+            } else {
+                const index = team.users.findIndex(usr => usr.username === memberEmail)
+                if(index !== -1) {
+                    res.status(404).json({error: 'already_team_member'})
+                } else {
+                    const maxTeamSize = licenseList[team.license].teamSize
+                    if(team.users >= maxTeamSize) {
+                        res.status(400).json({error: 'member_limit_reached'})
+                    } else {
+                        team.users.push(member._id)
+                        await team.save()
+                        res.status(200).end()
+                    }
+                }
+            }
         }
     }
 })

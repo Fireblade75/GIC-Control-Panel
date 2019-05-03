@@ -4,7 +4,7 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const model = mongoose.model('Team', {
     name: String,
     users: [{ type: ObjectId, ref: 'User' }],
-    licence: String,
+    license: String,
     owner: { type: ObjectId, ref: 'User' },
     slots: [{ type: ObjectId, ref: 'GameInstance' }]
 })

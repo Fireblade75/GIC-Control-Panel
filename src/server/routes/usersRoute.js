@@ -49,7 +49,7 @@ router.post('/register', (req, res) => {
                 bcrypt.hash(password, saltRounds, (err, hash) => {
                     if(err) throw err
                     new User({
-                        username,
+                        username: username.toLowerCase(),
                         fullName,
                         hash
                     }).save()

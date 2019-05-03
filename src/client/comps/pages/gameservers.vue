@@ -26,7 +26,7 @@
         },
         beforeMount: function() {
             this.$store.dispatch('fetchTeams')
-            this.$store.dispatch('fetchLicences')
+            this.$store.dispatch('fetchlicenses')
         }
     }
 </script>

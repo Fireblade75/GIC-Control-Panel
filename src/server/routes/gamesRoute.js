@@ -6,7 +6,7 @@ const GameInstance = require('../models/gameinstance')
 const { findUserByName } = require('../dbreqs/user-requests')
 const { findTeamByName } = require('../dbreqs/team-requests')
 const { findGameByName, findGamesByTeam } = require('../dbreqs/game-requests')
-const licenceList = require('../models/licences')
+const licenseList = require('../models/licenses')
 
 const router = Router()
 
@@ -31,8 +31,8 @@ router.post('/create', async (req, res) => {
         if(oldGame) {
             res.status(400).json({error: 'game_name_taken'})
         } else {
-            const licence = licenceList[team.licence]
-            const maxGames = licence.games
+            const license = licenseList[team.license]
+            const maxGames = license.games
             const gameCount = (await findGamesByTeam(team._id)).length
 
             if(gameCount < maxGames) {
@@ -70,9 +70,9 @@ router.post('/setslot', async (req, res) => {
     const user = await findUserByName(username)
     const team = await findTeamByName(teamName, user._id)
     if(team) {
-        const licence = licenceList[team.licence]
-        if(licence) {
-            const maxInstances = licence.instances
+        const license = licenseList[team.license]
+        if(license) {
+            const maxInstances = license.instances
             const slot = team.slots.find(s => s.slot === slotId)
             if(slot) {
                 slot.gameName = gameName
@@ -95,7 +95,7 @@ router.post('/setslot', async (req, res) => {
                 }
             }
         } else {
-            res.status(500).json({error: 'unknown_licence', licence: String(team.licence)})
+            res.status(500).json({error: 'unknown_license', license: String(team.license)})
         }
     } else {
         res.status(404).json({error: 'team_not_found'})

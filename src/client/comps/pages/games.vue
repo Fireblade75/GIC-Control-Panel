@@ -99,7 +99,7 @@
                                     this.error.message = 'This name is already taken'
                                     break
                                 case 'game_limit_reached':
-                                    this.error.message = 'Licence error: Max game limit reached'
+                                    this.error.message = 'license error: Max game limit reached'
                                     break
                                 default:
                                     this.error.message = res.error
