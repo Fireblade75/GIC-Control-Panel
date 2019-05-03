@@ -10,9 +10,10 @@ main {
     border-radius: 16px;
     border: 32px solid #f8f9fa;
 
-    @media screen and (max-width: 600px) {
+    @media (max-width: 575.98px) { 
         border-left: 16px solid #f8f9fa;
         border-right: 16px solid #f8f9fa;
+        border-radius: 0;
     }
 }
 

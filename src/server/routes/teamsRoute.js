@@ -139,8 +139,13 @@ router.get('/detail', async (req, res) => {
                     id: s.slot,
                     game: s.gameName
                 }}),
-                owner: team.owner.username,
-                members: team.users.map(usr => usr.username)
+                members: team.users.map(usr => {
+                    return {
+                        fullName: usr.fullName,
+                        email: usr.username,
+                        type: usr._id = team.owner._id ? 'Owner' : 'Member'
+                    }
+                })
             }
             res.json(result)
         }

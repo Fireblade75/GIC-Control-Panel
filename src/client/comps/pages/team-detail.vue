@@ -11,13 +11,11 @@
             <div class="mt-4 team-table">
                 <div class="row team-table-header">
                     <div class="col-sm-3">Name</div>
-                    <div class="col-sm-2">Running</div>
                 </div>
                 <div class="row" v-for="(game, index) in team.games" v-bind:key="index">
                     <div class="col-sm-3">{{game}}</div>
-                    <div class="col-sm-2">No</div>
                     <div class="col-sm-2">
-                        <button type="button" v-on:click.prevent="inviteMember" class="btn btn-danger w-100">Delete</button>
+                        <button type="button" v-on:click.prevent="inviteMember" class="btn btn-danger w-100  min-79">Delete</button>
                     </div>
                 </div>
             </div>
@@ -27,17 +25,20 @@
             These users are currently part of your team:
             <div class="team-table">
                 <div class="row team-table-header">
-                    <div class="col-sm-3">Username</div>
-                    <div class="col-sm-3">Type</div>
+                    <div class="col-lg-3 col-sm-4">Full Name</div>
+                    <div class="col-lg-3 col-sm-4">Email</div>
+                    <div class="col-lg-3 col-sm-2">Type</div>
+                    <div class="col-lg-2 col-sm-2">Remove</div>
                 </div>
                 <div class="row" v-for="(member, index) in team.members" v-bind:key="index">
-                    <div class="col-sm-3">{{member}}</div>
-                    <div class="col-sm-2">{{member === team.owner ? 'Owner' : 'Member'}}</div>
-                    <div class="col-sm-2">
+                    <div class="col-lg-3 col-sm-4">{{member.fullName}}</div>
+                    <div class="col-lg-3 col-sm-4">{{member.email}}</div>
+                    <div class="col-lg-3 col-sm-2">{{member.type}}</div>
+                    <div class="col-sm-2 col-xs-3">
                         <button type="button" 
                             v-on:click.prevent="inviteMember" 
-                            class="btn btn-danger w-100"
-                            v-bind:disabled="member === team.owner">Delete</button>
+                            class="btn btn-danger w-100 min-79"
+                            v-bind:disabled="member.type === 'Owner'">Remove</button>
                     </div>
                 </div>
             </div>
@@ -138,5 +139,9 @@
 
     .team-table-header {
         font-weight: bold;
+    }
+
+    .min-79 {
+        min-width: 79px;
     }
 </style>
