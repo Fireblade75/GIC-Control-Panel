@@ -4,6 +4,9 @@ const User = require('../models/user')
 const Team = require('../models/team')
 const GameInstance = require('../models/gameinstance')
 const licences = require('../models/licences')
+const { findUserByName } = require('../dbreqs/user-requests')
+const { findTeamDetail } = require('../dbreqs/team-requests')
+const { findGameByName, findGamesByTeam } = require('../dbreqs/game-requests')
 
 const router = Router()
 
@@ -110,6 +113,37 @@ router.post('/create', (req, res) => {
                 }
             }) 
         })
+    }
+})
+
+router.get('/detail', async (req, res) => {
+    const username = req.username
+    const { teamName } = req.query
+    if(!username) {
+        res.status(403).end()
+    } else if(!teamName) {
+        res.status(400).end()
+    } else {
+        const user = await findUserByName(username)
+        const team = await findTeamDetail(teamName, user._id)
+        if(!team) {
+            res.status(404).json({error: team_not_found})
+        } else {
+            const games = await findGamesByTeam(team._id)
+            const result = {
+                id: team._id,
+                name: team.name, 
+                licence: team.licence,
+                games: games.map(g => g.name),
+                slots: team.slots.map(s => { return {
+                    id: s.slot,
+                    game: s.gameName
+                }}),
+                owner: team.owner.username,
+                members: team.users.map(usr => usr.username)
+            }
+            res.json(result)
+        }
     }
 })
 
