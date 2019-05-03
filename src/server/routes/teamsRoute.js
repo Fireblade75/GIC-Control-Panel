@@ -146,7 +146,8 @@ router.get('/detail', async (req, res) => {
                         email: usr.username,
                         type: isOwner ? 'Owner' : 'Member'
                     }
-                })
+                }),
+                isOwner: user._id.equals(team.owner._id)
             }
             res.json(result)
         }
@@ -167,21 +168,25 @@ router.post('/add-member', async (req, res) => {
         if(!team) {
             res.status(404).json({error: 'team_not_found'})
         } else {
-            const member = await findUserByName(memberEmail)
-            if(!member) {
-                res.status(404).json({error: 'member_not_found'})
+            if(!team.owner._id.equals(user._id)) {
+                res.status(404).json({error: 'user_not_owner'})
             } else {
-                const index = team.users.findIndex(usr => usr.username === memberEmail)
-                if(index !== -1) {
-                    res.status(404).json({error: 'already_team_member'})
+                const member = await findUserByName(memberEmail)
+                if(!member) {
+                    res.status(404).json({error: 'member_not_found'})
                 } else {
-                    const maxTeamSize = licenseList[team.license].teamSize
-                    if(team.users >= maxTeamSize) {
-                        res.status(400).json({error: 'member_limit_reached'})
+                    const index = team.users.findIndex(usr => usr.username === memberEmail)
+                    if(index !== -1) {
+                        res.status(404).json({error: 'already_team_member'})
                     } else {
-                        team.users.push(member._id)
-                        await team.save()
-                        res.status(200).end()
+                        const maxTeamSize = licenseList[team.license].teamSize
+                        if(team.users >= maxTeamSize) {
+                            res.status(400).json({error: 'member_limit_reached'})
+                        } else {
+                            team.users.push(member._id)
+                            await team.save()
+                            res.status(200).end()
+                        }
                     }
                 }
             }

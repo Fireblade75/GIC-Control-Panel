@@ -28,13 +28,13 @@
                     <div class="col-lg-3 col-sm-4">Full Name</div>
                     <div class="col-lg-3 col-sm-4">Email</div>
                     <div class="col-lg-3 col-sm-2">Type</div>
-                    <div class="col-lg-2 col-sm-2">Remove</div>
+                    <div class="col-lg-2 col-sm-2" v-if="team.isOwner">Remove</div>
                 </div>
                 <div class="row" v-for="(member, index) in team.members" v-bind:key="index">
                     <div class="col-lg-3 col-sm-4">{{member.fullName}}</div>
                     <div class="col-lg-3 col-sm-4">{{member.email}}</div>
                     <div class="col-lg-3 col-sm-2">{{member.type}}</div>
-                    <div class="col-sm-2 col-xs-3">
+                    <div class="col-sm-2 col-xs-3" v-if="team.isOwner">
                         <button type="button" 
                             v-on:click.prevent="inviteMember" 
                             class="btn btn-danger w-100 min-79"
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </section>
-        <section class="mt-5">
+        <section class="mt-5" v-if="team.isOwner">
             <h3>Add a team Members</h3>
             Add a member to your team so they can also manage your games:
             <form class="mt-4">
