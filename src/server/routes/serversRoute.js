@@ -13,6 +13,7 @@ router.get('/', (req, res) => {
                     server_region: s.region
                 }
             })
+            res.json(result)
         } else {
             res.status(204).end()
         }

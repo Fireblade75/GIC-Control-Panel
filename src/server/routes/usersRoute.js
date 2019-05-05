@@ -60,4 +60,37 @@ router.post('/register', (req, res) => {
     }
 })
 
+// router.post('/remove-member', async (req, res) => {
+//     const username = req.username
+//     let { teamName, memberEmail } = req.body
+//     if(!username) {
+//         res.status(403).end()
+//     } else if(!teamName || !memberEmail) {
+//         res.status(400).end()
+//     } else {
+//         memberEmail = memberEmail.toLowerCase()
+//         const user = await findUserByName(username)
+//         const team = await findTeamDetail(teamName, user._id)
+//         if(!team) {
+//             res.status(404).json({error: 'team_not_found'})
+//         } else {
+//             if(!team.owner._id.equals(user._id)) {
+//                 res.status(404).json({error: 'user_not_owner'})
+//             } else {
+//                 const member = await findUserByName(memberEmail)
+//                 if(!member) {
+//                     res.status(404).json({error: 'member_not_found'})
+//                 } else {
+//                     if(member._id.equals(team.owner._id)) {
+//                         res.status(400).json({error: 'cannot_remove_owner'})
+//                     } else {
+//                         member.delete().exec()
+//                         res.status(200).end()
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// })
+
 module.exports = router

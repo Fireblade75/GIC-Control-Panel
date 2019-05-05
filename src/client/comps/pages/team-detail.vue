@@ -36,7 +36,7 @@
                     <div class="col-lg-3 col-sm-2">{{member.type}}</div>
                     <div class="col-sm-2 col-xs-3" v-if="team.isOwner">
                         <button type="button" 
-                            v-on:click.prevent="inviteMember" 
+                            v-on:click.prevent="removeMember(member.email)" 
                             class="btn btn-danger w-100 min-79"
                             v-bind:disabled="member.type === 'Owner'">Remove</button>
                     </div>
@@ -152,6 +152,31 @@
                     } else {
                         this.team = res
                     }
+                })
+            },
+            removeMember: function(userName) {
+                fetch('/api/teams/remove-member', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': this.$store.getters.getToken
+                    },
+                    body: JSON.stringify({
+                        teamName: this.teamName,
+                        memberEmail: userName
+                    })
+                })
+                .then(res => {
+                    const status = res.status
+                    if(status != 200) {
+                        res.json().then(err => {
+                            if(err.error) {
+                                console.error(res.error)
+                            }
+                        })
+                    } else {
+                        this.fetchTeam()
+                    }    
                 })
             }
         },

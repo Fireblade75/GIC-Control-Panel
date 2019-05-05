@@ -4,9 +4,10 @@ const Game = require('../models/game')
 const Team = require('../models/team')
 const GameInstance = require('../models/gameinstance')
 const { findUserByName } = require('../dbreqs/user-requests')
-const { findTeamByName } = require('../dbreqs/team-requests')
+const { findTeamByName, findTeamsByUser } = require('../dbreqs/team-requests')
 const { findGameByName, findGamesByTeam } = require('../dbreqs/game-requests')
 const licenseList = require('../models/licenses')
+const upload = require('multer')
 
 const router = Router()
 
@@ -99,6 +100,29 @@ router.post('/setslot', async (req, res) => {
         }
     } else {
         res.status(404).json({error: 'team_not_found'})
+    }
+})
+
+router.post('/set-sources', (req, res) => {
+    res.status(200).end()
+})
+
+router.get('/gamelist', async (req, res) => {
+    const username = req.username
+    if(!username) {
+        res.status(403).end()
+    } else {
+        const user = await findUserByName(username)
+        const teams = await findTeamsByUser(user._id)
+        
+        const promises = teams.map(team => {
+            return findGamesByTeam(team._id)
+        })
+        let gameList = await Promise.all(promises)
+        gameList = [].concat.apply([], gameList)
+
+        const result = gameList.map(game => game.name)
+        res.json(result)
     }
 })
 

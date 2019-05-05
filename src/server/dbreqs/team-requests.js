@@ -37,6 +37,18 @@ module.exports = {
                     }
                 })
         })
+    },
+
+    findTeamsByUser(userId) {
+        return new Promise((resolve, reject) => {
+            Team.find({users: userId}, (err, users) => {
+                if(err) {
+                    reject(err)
+                } else {
+                    resolve(users)
+                }
+            })
+        })
     }
 }
 
