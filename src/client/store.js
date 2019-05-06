@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import fetchTeams from './fetchers/fetchTeams'
-
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -10,7 +8,8 @@ const store = new Vuex.Store({
         username: '',
         authToken: '',
         teamList: [],
-        licenses: []
+        licenses: [],
+        servers: []
     },
     getters: {
         getUsername: (state) => {
@@ -27,6 +26,9 @@ const store = new Vuex.Store({
         },
         getLicenses: (state) => {
             return state.licenses
+        },
+        getServers: (state) => {
+            return state.servers
         }
     },
     mutations: {
@@ -39,6 +41,12 @@ const store = new Vuex.Store({
         },
         setTeamList: (state, teams) => {
             state.teamList = teams
+        },
+        setLicenses: (state, licenses) => {
+            state.licenses = licenses
+        },
+        setServers: (state, servers) => {
+            state.servers = servers
         }
     },
     actions: {
@@ -63,12 +71,21 @@ const store = new Vuex.Store({
                 })
             }
         },
-        fetchlicenses: (context) => {
+        fetchLicenses: (context) => {
             if(!context.state.licenses.length) {
                 fetch('/api/teams/licenses')
                 .then(res => res.json())
                 .then(res => {
-                    context.state.licenses = res
+                    context.commit('setLicenses', res)
+                })
+            }
+        },
+        fetchServers: (context) => {
+            if(!context.state.servers.length) {
+                fetch('/api/servers/get-regions')
+                .then(res => res.json())
+                .then(res => {
+                    context.commit('setServers', res)
                 })
             }
         }

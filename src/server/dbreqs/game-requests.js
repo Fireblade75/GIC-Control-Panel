@@ -1,4 +1,5 @@
 const Game = require('../models/game')
+const GameInstance = require('../models/gameinstance')
 
 module.exports = {
     findGamesByTeam(teamId) {
@@ -12,13 +13,31 @@ module.exports = {
             })
         })
     },
-    findGameByName(gameName) {
+    findGameByName(gameName, options = {}) {
+        const fetchTeam = options.fetchTeam || false
         return new Promise((resolve, reject) => {
-            Game.findOne({name: gameName}, (err, game) => {
+            const query = Game.findOne({name: gameName})
+            
+            if(fetchTeam) {
+                query.populate('team')
+            }
+
+            query.exec((err, game) => {
                 if(err) {
                     reject(err)
                 } else {
                     resolve(game)
+                }
+            })
+        })
+    },
+    findGameInstancesByGame(gameName) {
+        return new Promise((resolve, reject) => {
+            GameInstance.find({gameName}).populate('server').exec((err, instances) => {
+                if(err) {
+                    reject(err)
+                } else {
+                    resolve(instances)
                 }
             })
         })

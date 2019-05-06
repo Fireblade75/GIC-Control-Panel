@@ -25,7 +25,7 @@
                     <div class="col-sm-10">
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="game-file" @change="processFile('gameFile', $event)">
-                            <label class="custom-file-label" for="game-file">Choose file</label>
+                            <label class="custom-file-label" for="game-file">{{gameFile.fileName}}</label>
                         </div>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                     <div class="col-sm-10">
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="update-file" @change="processFile('updateFile', $event)">
-                            <label class="custom-file-label" for="update-file">Choose file</label>
+                            <label class="custom-file-label" for="update-file">{{updateFile.fileName}}</label>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     v-on:closeAlert="closeUpdateError" />
                 <div class="row">
                     <div class="offset-sm-2 col-sm-10">
-                        <button type="submit" v-on:click.prevent="updateGame" class="btn btn-primary col-sm-3">Update Game</button>
+                        <button type="submit" v-on:click.prevent="updateGame(selectedGame, updateFile)" class="btn btn-primary col-sm-3">Update Game</button>
                     </div>
                 </div>
             </form>
@@ -109,8 +109,14 @@
                         level: ''
                     }
                 },
-                gameFile: null,
-                updateFile: null
+                gameFile: {
+                    fileName: 'Choose file',
+                    blob: null
+                },
+                updateFile: {
+                    fileName: 'Choose file',
+                    blob: null
+                }
             }
         },
         computed: {
@@ -121,14 +127,19 @@
         methods: {
             addGame: function(event) {
                 if(!this.newGameName) {
-                    this.error = {
+                    this.errors.createError = {
                         message: 'Game name can not be empty',
                         level: 'warning'
                     }
                 } else if(this.selectedTeam === '---') {
-                    this.error = {
+                    this.errors.createError = {
                         message: 'Please select a team',
                         level: 'warning'
+                    }
+                } else if(this.gameFile.fileName === 'Choose file') {
+                    this.errors.createError = {
+                        level: 'warning',
+                        message: 'Please select a .zip file'
                     }
                 } else {
                     fetch('/api/games/create', {
@@ -145,31 +156,51 @@
                     .then(res => res.json())
                     .then(res => {
                         if(res.error) {
-                            this.error.level = 'error'
+                            this.errors.createError.level = 'error'
                             switch(res.error) {
                                 case 'game_name_taken':
-                                    this.error.message = 'This name is already taken'
+                                    this.errors.createError.message = 'This name is already taken'
                                     break
                                 case 'game_limit_reached':
-                                    this.error.message = 'license error: Max game limit reached'
+                                    this.errors.createError.message = 'License error: Max game limit reached'
                                     break
                                 default:
-                                    this.error.message = res.error
+                                    this.errors.createError.message = res.error
                             }
                         } else {
-                            this.error = {
+                            this.errors.createError = {
                                 level: 'success',
                                 message: '"' + this.newGameName + '" is successfully created'
                             }
+                            this.uploadFile(this.newGameName, this.gameFile, true)
                             this.newGameName = ''
-                            uploadFile()
+                            this.gameFile = {
+                                fileName: 'Choose file',
+                                blob: null
+                            }
                         }
                     })
                 }
             },
-            uploadFile: function() {
+            updateGame: function(gameName, gameFile) {
+                if(this.updateFile.fileName === 'Choose file') {
+                    this.errors.updateError = {
+                        level: 'warning',
+                        message: 'Please select a .zip file'
+                    }
+                } else {
+                    this.uploadFile(gameName, gameFile, false)
+                    this.updateFile = {
+                        fileName: 'Choose file',
+                        blob: null
+                    }
+                }
+            },
+            uploadFile: function(gameName, gameFile, create = true) {
                 const formData = new FormData()
-                formData.append('game', this.gameFile.blob, this.gameFile.fileName)
+                formData.append('gameName', gameName)
+                formData.append('gameFile', gameFile.blob, gameFile.fileName)
+
                 fetch('/api/games/set-sources', {
                     method: 'POST',
                     headers: {
@@ -178,11 +209,26 @@
                     body: formData
                 }).then(res => {
                     const status = res.status
+                    let message =  {}
                     if(status !== 200) {
                         res.json().then(err => {
-                            this.fileError.level = 'error'
-                            this.fileError.message = err.error
+                            message.level = 'error'
+                            if(err.error === 'wrong_mime_type') {
+                                message.message = 'File is not a zip'
+                            } else {
+                                message.message = err.error
+                            }
                         })
+                    } else {
+                        message = {
+                            level: 'success',
+                            message: 'Successfully uploaded game sources'
+                        }
+                    }
+                    if(create) {
+                        this.errors.fileError = message
+                    } else {
+                        this.errors.updateError = message
                     }
                 })
             },
@@ -206,17 +252,32 @@
             },
             processFile(field, event) {
                 const files = event.target.files || event.dataTransfer.files
-                let fileData = null
+                let fileData = {
+                    fileName: 'Choose file',
+                    blob: null
+                }
+                let error = null
+
                 if (files.length) {
-                    fileData = {
-                        blob: files[0],
-                        fileName: files[0].name
+                    const fileName = files[0].name
+                    if(fileName.endsWith('.zip')) {
+                        fileData = {
+                            blob: files[0],
+                            fileName: fileName
+                        }
+                    } else {
+                        error = {
+                            level: 'warning',
+                            message: 'Only .zip files are supported'
+                        }
                     }
                 }
                 if(field === 'gameFile') {
                     this.gameFile = fileData
+                    if(error) this.errors.fileError = error
                 } else if(field === 'updateFile') {
                     this.updateFile = fileData
+                    if(error) this.errors.updateError = error
                 }
             },
             fetchGames() {

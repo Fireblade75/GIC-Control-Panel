@@ -56,28 +56,52 @@
                     level: ''
                 }
             },
-            applyUpdate: function(slot, gameName) {
-                fetch('/api/games/setslot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': this.$store.getters.getToken
-                    },
-                    body: JSON.stringify({
-                        gameName: gameName,
-                        slotId: slot,
-                        teamName: this.team.name
-                    })
-                })
-                .then(res => {
-                    const status = res.status
-                    if(status == 200 || status == 201) {
-                        this.error = {
-                            message: gameName + ' is now runing on server ' + slot,
-                            level: 'success'
-                        }
+            applyUpdate: function(slot, gameName, region) {
+                if(region === '---') {
+                    this.error = {
+                        message: 'Please select a region',
+                        level: 'warning'
                     }
-                })
+                } else {
+                    fetch('/api/games/setslot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': this.$store.getters.getToken
+                        },
+                        body: JSON.stringify({
+                            gameName: gameName,
+                            slotId: slot,
+                            teamName: this.team.name,
+                            region: region
+                        })
+                    })
+                    .then(res => {
+                        const status = res.status
+                        if(status == 200 || status == 201) {
+                            if(gameName !== '---') {
+                                this.error = {
+                                    message: gameName + ' is now runing on server ' + slot,
+                                    level: 'success'
+                                }
+                            } else {
+                                this.error = {
+                                    message: 'Removed game from server ' + slot,
+                                    level: 'success'
+                                }
+                            }
+                        } else {
+                            res.json().then(err => {
+                                this.error.level = 'error'
+                                if(err.error === 'no_available_server') {
+                                    this.error.message = 'No available server for this region'
+                                } else {
+                                    this.error.message = err.error
+                                }
+                            })
+                        }
+                    })
+                }
             }
         }
     }

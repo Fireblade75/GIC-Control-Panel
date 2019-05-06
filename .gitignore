@@ -134,3 +134,7 @@ node_modules
 dist
 *.log
 yarn.lock
+
+# game uploads
+games/
+tmp/

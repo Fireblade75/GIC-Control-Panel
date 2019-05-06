@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken')
 const path = require('path')
+const fs = require('fs')
 require('dotenv').config()
 
 const serversRoute = require('./routes/serversRoute')
@@ -11,7 +12,16 @@ const teamsRoute = require('./routes/teamsRoute')
 const gamesRoute = require('./routes/gamesRoute')
 const usersRoute = require('./routes/usersRoute')
 
-mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true});
+mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true, useFindAndModify: false});
+
+const gamesPath = path.join(__dirname, '../../games')
+const tempPath = path.join(__dirname, '../../tmp')
+if (!fs.existsSync(gamesPath)) {
+    fs.mkdirSync(gamesPath)
+}
+if (!fs.existsSync(tempPath)) {
+    fs.mkdirSync(tempPath)
+}
 
 const app = express()
 app.use(bodyParser.json())
